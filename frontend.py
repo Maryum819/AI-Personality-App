@@ -4,6 +4,19 @@ import random
 import smtplib
 import os
 import pickle
+st.markdown("""
+<style>
+body {
+    background-color: #0e1117;
+    color: white;
+}
+.stButton>button {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
 from email.mime.text import MIMEText
 
 # ---------------- EMAIL CONFIG ----------------
@@ -136,9 +149,9 @@ elif menu == "Dashboard":
                     result = model.predict([[study, sleep, social]])
 
                     if result[0] == 1:
-                        st.success("🔥 High Performer")
-                    else:
-                        st.warning("⚠ Needs Improvement")
+    st.success("🔥 You are highly focused and disciplined. You have strong potential to achieve big goals!")
+else:
+    st.warning("⚠ You need better balance in study and lifestyle. Small improvements can make you successful!")
 
                 except Exception as e:
                     st.error(f"Prediction error: {e}")
