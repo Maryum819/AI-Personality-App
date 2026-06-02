@@ -1,9 +1,14 @@
-
 import streamlit as st
 import random
 import smtplib
+import ssl
 import os
 import pickle
+
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(page_title="AI Personality System", layout="centered")
+
+# ---------------- CSS (UI POLISH) ----------------
 st.markdown("""
 <style>
 body {
@@ -14,26 +19,25 @@ body {
     background-color: #4CAF50;
     color: white;
     border-radius: 10px;
+    height: 40px;
+    width: 100%;
 }
 </style>
 """, unsafe_allow_html=True)
-from email.mime.text import MIMEText
 
 # ---------------- EMAIL CONFIG ----------------
 GMAIL_USER = "smartai.project.lab9@gmail.com"
 GMAIL_APP_PASSWORD = "qbcy tskr wqym bdih"
 
-# ---------------- LOAD MODEL (DEPLOY SAFE) ----------------
+# ---------------- LOAD MODEL SAFELY ----------------
 model = None
 
-try:
-    if os.path.exists("model.pkl"):
+if os.path.exists("model.pkl"):
+    try:
         with open("model.pkl", "rb") as f:
             model = pickle.load(f)
-    else:
-        st.warning("Model file not found")
-except Exception as e:
-    st.error(f"Model loading error: {e}")
+    except:
+        model = None
 
 # ---------------- SESSION ----------------
 if "users" not in st.session_state:
@@ -50,34 +54,33 @@ if "current_user" not in st.session_state:
 
 # ---------------- OTP FUNCTION ----------------
 def send_otp(email):
+
     if email.strip() == "":
         return None
 
     otp = str(random.randint(1000, 9999))
 
-    msg = MIMEText(f"Your OTP is: {otp}")
-    msg["Subject"] = "AI Project OTP"
-    msg["From"] = GMAIL_USER
-    msg["To"] = email
+    message = f"Subject: OTP Code\n\nYour OTP is: {otp}"
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
+        context = ssl.create_default_context()
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context)
         server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-        server.send_message(msg)
+        server.sendmail(GMAIL_USER, email, message)
         server.quit()
         return otp
+
     except:
         return None
 
-# ---------------- UI ----------------
-st.set_page_config(page_title="AI Smart System", layout="centered")
+# ---------------- TITLE ----------------
 st.title("✨ AI Personality Prediction System")
 
 menu = st.sidebar.radio("Menu", ["Signup", "Login", "Dashboard"])
 
 # ---------------- SIGNUP ----------------
 if menu == "Signup":
+
     st.subheader("Create Account")
 
     name = st.text_input("Name")
@@ -90,16 +93,16 @@ if menu == "Signup":
             st.error("Fill all fields")
 
         elif not name.isalpha():
-            st.error("Name must be alphabets only")
+            st.error("Name must contain only alphabets")
 
         else:
             otp = send_otp(email)
 
-            if otp is None:
-                st.error("OTP not sent")
-            else:
+            if otp:
                 st.session_state.otp = otp
-                st.success("OTP sent")
+                st.success("OTP sent successfully")
+            else:
+                st.error("OTP not sent")
 
     otp_input = st.text_input("Enter OTP")
 
@@ -107,12 +110,13 @@ if menu == "Signup":
 
         if otp_input == st.session_state.otp and otp_input != "":
             st.session_state.users[email] = password
-            st.success("Account created")
+            st.success("Account created successfully")
         else:
             st.error("Invalid OTP")
 
 # ---------------- LOGIN ----------------
 elif menu == "Login":
+
     st.subheader("Login")
 
     email = st.text_input("Email")
@@ -134,31 +138,30 @@ elif menu == "Dashboard":
 
         st.subheader(f"Welcome {st.session_state.current_user}")
 
-        # INPUTS
         study = st.slider("Study Level", 0, 10)
         sleep = st.slider("Sleep Level", 0, 10)
         social = st.slider("Social Activity", 0, 10)
 
-        if st.button("Predict"):
+        if st.button("Predict Personality"):
 
             if model is None:
                 st.error("Model not loaded")
-
             else:
                 try:
                     result = model.predict([[study, sleep, social]])
 
                     if result[0] == 1:
-    st.success("🔥 You are highly focused and disciplined. You have strong potential to achieve big goals!")
-else:
-    st.warning("⚠ You need better balance in study and lifestyle. Small improvements can make you successful!")
+                        st.success("🔥 You are highly focused and disciplined. You have strong potential to achieve big goals!")
+                    else:
+                        st.warning("⚠ You need better balance in study and lifestyle.")
+
                 except Exception as e:
-                    st.error(f"Prediction error: {e}")
+                    st.error(f"Error: {e}")
 
         if st.button("Logout"):
             st.session_state.logged_in = False
             st.session_state.current_user = ""
-            st.success("Logged out")
+            st.success("Logged out successfully")
 
     else:
         st.warning("Please login first")
