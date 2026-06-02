@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 
 # ---------------- EMAIL CONFIG ----------------
 GMAIL_USER = "smartai.project.lab9@gmail.com"
-GMAIL_APP_PASSWORD = "PASTE_YOUR_APP_PASSWORD"
+GMAIL_APP_PASSWORD = "qbcy tskr wqym bdih"
 
 # ---------------- LOAD MODEL (DEPLOY SAFE) ----------------
 model = None
