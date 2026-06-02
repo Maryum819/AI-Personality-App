@@ -152,7 +152,6 @@ elif menu == "Dashboard":
     st.success("🔥 You are highly focused and disciplined. You have strong potential to achieve big goals!")
 else:
     st.warning("⚠ You need better balance in study and lifestyle. Small improvements can make you successful!")
-
                 except Exception as e:
                     st.error(f"Prediction error: {e}")
 
