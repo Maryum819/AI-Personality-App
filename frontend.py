@@ -26,8 +26,8 @@ body {
 """, unsafe_allow_html=True)
 
 # ---------------- EMAIL CONFIG ----------------
-GMAIL_USER = "smartai.project.lab9@gmail.com"
-GMAIL_APP_PASSWORD = "qbcy tskr wqym bdih"
+GMAIL_USER = "smartai.personalitypredictorx5@gmail.com"
+GMAIL_APP_PASSWORD = "roxg wohb ktps sfzh"
 
 # ---------------- LOAD MODEL SAFELY ----------------
 model = None
